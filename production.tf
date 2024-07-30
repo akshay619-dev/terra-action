@@ -37,10 +37,10 @@ resource "aws_security_group" "tf_sg" {
   }
 }
 
-resource "aws_key_pair" "tf_key" {
-  key_name   = var.key_pair_name
-  public_key = file("${path.module}/${var.key_pair_name}.pub")
-}
+# resource "aws_key_pair" "tf_key" {
+#   key_name   = var.key_pair_name
+#   public_key = file("${path.module}/${var.key_pair_name}.pub")
+# }
 
 
 resource "aws_instance" "tf_action_machine" {
@@ -55,7 +55,7 @@ resource "aws_instance" "tf_action_machine" {
     volume_size           = var.volume_size
     delete_on_termination = true
   }
-  key_name               = aws_key_pair.tf_key.key_name
+  key_name               = var.key_pair_name
   vpc_security_group_ids = ["${aws_security_group.tf_sg.id}"]
   subnet_id              = flatten(module.networking.public_subnets_id)[0]
   depends_on             = [module.networking]

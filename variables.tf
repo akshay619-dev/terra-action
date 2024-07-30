@@ -57,5 +57,5 @@ variable "instance_ami" {
 
 variable "key_pair_name" {
   type    = string
-  default = "tf_action_machine_key_pair"
+  default = "copilot_machine_key"
 }
