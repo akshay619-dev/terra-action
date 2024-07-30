@@ -1,0 +1,98 @@
+name: CICD PIPELINE
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["./"]
+
+  pull_request:
+    branches: [main]
+    paths: ["./"]
+
+  workflow_dispatch:
+    inputs:
+      destroy:
+        description: 'Destroy Terraform resources'
+        required: false
+        default: 'false'  
+jobs:
+  plan:
+    name: Terraform plan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:  ${{ secrets.AWS_REGION }}
+      - name: Initialise project and view terraform plan
+        env:
+          ssh_key: ${{ secrets.AWS_PEM_SECRET }}
+        run: |
+          terraform fmt
+          terraform init 
+          terraform validate
+          terraform plan -var="key_pair_pem=${{ secrets.AWS_PEM_SECRET }}"
+
+  deploy:
+    name: Terraform Deploy
+    needs: plan
+    if: github.event.inputs.destroy != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:  ${{ secrets.AWS_REGION }}
+      - name: Initialise project and deploy terraform
+        env:
+          ssh_key: ${{ secrets.AWS_PEM_SECRET }}
+        run: |
+          terraform fmt
+          terraform init 
+          terraform validate
+          terraform apply -var="key_pair_pem=${{ secrets.AWS_PEM_SECRET }}"  --auto-approve=true       
+  
+  destroy:
+    name: Terraform Destroy
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: github.event.inputs.destroy == 'true'   
+    runs-on: ubuntu-latest  
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:  ${{ secrets.AWS_REGION }} 
+       - name: Destroy terraform
+        env:
+          ssh_key: ${{ secrets.AWS_PEM_SECRET }}
+        run: |
+          terraform fmt
+          terraform init 
+          terraform validate
+          terraform destroy -var="key_pair_pem=${{ secrets.AWS_PEM_SECRET }}"  --auto-approve=true       
+      
+
+  
