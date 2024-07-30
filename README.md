@@ -1,12 +1,12 @@
 ## Deploy EC2 Instance , VPC , Public & Private Subnet, IG and Route Table with Terraform Script and Github Action Workflow
 
 
-# Create .pem file to access ec2 instance using ssh-keygen 
+#Create .pem file to access ec2 instance using ssh-keygen 
 
 ```shell
     ssh-keygen
 ```
-# Enter...Enter...Enter... ,you got your keys. Rename it as .pem and .pub should be look like below 
+#Enter...Enter...Enter... ,you got your keys. Rename it as .pem and .pub should be look like below 
 
 ```shell
    your_key_pair.pem
@@ -14,28 +14,28 @@
 ``` 
 
 
-# Step 1 : Initialize the Terraform
+#Step 1 : Initialize the Terraform
 
 ```shell
 terraform init
 
 ```
 
-# Step 2 : Check the configuration plan
+#Step 2 : Check the configuration plan
 
 ```shell
 terraform plan
 
 ```
 
-# Step 3 : Apply the configuration with custome input variable
+#Step 3 : Apply the configuration with custome input variable
 
 ```shell
 terraform apply -var "instance_name=your_instance_name"  -var "key_pair_name=your_key_pair"  -var "volume_size=30"  -var "instance_type=t3.micro"  -auto-approve
 
 ``` 
 
-# Step 4 : Clean Up 
+#Step 4 : Clean Up 
 
 ```shell
 terraform destroy
