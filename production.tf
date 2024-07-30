@@ -57,6 +57,6 @@ resource "aws_instance" "tf_action_machine" {
   }
   key_name               = aws_key_pair.tf_key.key_name
   vpc_security_group_ids = ["${aws_security_group.tf_sg.id}"]
-  subnet_id               = flatten(module.networking.public_subnets_id)[0]
+  subnet_id              = flatten(module.networking.public_subnets_id)[0]
   depends_on             = [module.networking]
 }
