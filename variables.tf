@@ -59,3 +59,18 @@ variable "key_pair_name" {
   type    = string
   default = "copilot_machine_key"
 }
+
+variable "bucket_name" {
+  type = string
+  default = "terraform-pro-s3"
+  
+}
+variable "dynamo_db_table" {
+  type = string
+  default = "terra_action_dylock"
+}
+
+variable "key_pair_pem" {
+  type    = string
+  default = "copilot_machine_key.pem"
+}

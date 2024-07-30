@@ -29,6 +29,12 @@ resource "aws_security_group" "tf_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   egress {
     from_port   = 0
     to_port     = 0
@@ -42,6 +48,10 @@ resource "aws_security_group" "tf_sg" {
 #   public_key = file("${path.module}/${var.key_pair_name}.pub")
 # }
 
+
+resource "aws_s3_bucket" "tf_course" {
+    bucket = var.bucket_name
+}
 
 resource "aws_instance" "tf_action_machine" {
   ami           = var.instance_ami
@@ -59,4 +69,26 @@ resource "aws_instance" "tf_action_machine" {
   vpc_security_group_ids = ["${aws_security_group.tf_sg.id}"]
   subnet_id              = flatten(module.networking.public_subnets_id)[0]
   depends_on             = [module.networking]
+
+  # nginx installation
+  provisioner "file" {
+      source = "nginx.sh"
+      destination = "/tmp/nginx.sh"
+  }
+
+  provisioner "remote-exec" {
+      inline = [
+          "chmod +x /tmp/nginx.sh",
+          "sudo /tmp/nginx.sh"
+      ]
+  }
+
+  connection {
+    type     = "ssh"
+    user     = "ubuntu"
+    host     = self.public_ip
+    private_key = file("${path.module}/${var.key_pair_pem}")
+  }
+
 }
+
