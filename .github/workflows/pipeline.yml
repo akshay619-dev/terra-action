@@ -84,13 +84,13 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region:  ${{ secrets.AWS_REGION }} 
        - name: Destroy terraform
-        env:
-          ssh_key: ${{ secrets.AWS_PEM_SECRET }}
-        run: |
-          terraform fmt
-          terraform init 
-          terraform validate
-          terraform destroy -var="key_pair_pem=${{ secrets.AWS_PEM_SECRET }}"  --auto-approve=true       
+          env:
+            ssh_key: ${{ secrets.AWS_PEM_SECRET }}
+          run: |
+            terraform fmt
+            terraform init 
+            terraform validate
+            terraform destroy -var="key_pair_pem=${{ secrets.AWS_PEM_SECRET }}"  --auto-approve=true       
       
 
   
